@@ -1,0 +1,19 @@
+digraph G {
+  rankdir=LR; nodesep=0.3; ranksep=0.45;
+  node [shape=record, fontname="Helvetica", fontsize=9, style=filled, fillcolor="#f4f6fb", color="#1f3a68"];
+  edge [fontname="Helvetica", fontsize=8, color="#444444"];
+  H [label="{Hostel|name\lrooms : List\lwarden : Resident\l}"];
+  L1 [label="ArrayList\<Room\>", shape=box];
+  R1 [label="{Room 101|number, beds\lhostel (back-reference)\l}"];
+  R2 [label="{Room 102|number, beds\lhostel\l}"];
+  LA [label="ArrayList\<Resident\>", shape=box]; LB [label="ArrayList\<Resident\>", shape=box];
+  A [label="{Resident Arun|name, regNo\l|transient password\ltransient Connection db\l}"];
+  D [label="{Resident Divya|name, regNo\l|transient password, db\l}"];
+  K [label="{Resident Karthik|name, regNo\l|transient password, db\l}"];
+  C [label="live JDBC Connection\n(socket - NOT serializable)", shape=box, style="rounded,dashed", fillcolor="#ffffff"];
+  H -> L1 -> R1; L1 -> R2;
+  R1 -> LA -> A; LA -> D; R2 -> LB -> K;
+  H -> A [label="warden: same object,\nwritten once", style=bold, color="#eb6834", fontcolor="#eb6834"];
+  R1 -> H [label="cycle", style=dashed]; R2 -> H [style=dashed];
+  A -> C [style=dotted, label="transient: not followed", arrowhead=none];
+}

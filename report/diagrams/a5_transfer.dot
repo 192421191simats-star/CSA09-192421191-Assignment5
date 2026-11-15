@@ -1,0 +1,16 @@
+digraph G {
+  rankdir=LR; nodesep=0.35; ranksep=0.4;
+  node [shape=box, fontname="Helvetica", fontsize=9, style="rounded,filled", fillcolor="#f4f6fb", color="#1f3a68"];
+  edge [fontname="Helvetica", fontsize=8, color="#444444"];
+  s [label="setAutoCommit(false)\n(BEGIN)"];
+  d [label="UPDATE wallet SET balance = balance - 500\nWHERE wallet_id = hostel AND balance >= 500"];
+  c [label="UPDATE wallet SET balance = balance + 500\nWHERE wallet_id = canteen"];
+  ok [label="commit()\nboth changes permanent", fillcolor="#e3f4ea", color="#1baf7a"];
+  rb [label="rollback()\nneither change survives", fillcolor="#fdecea", color="#e34948"];
+  crash [label="program / JVM dies", shape=box, style="rounded,dashed", fillcolor="#ffffff"];
+  srv [label="server aborts the open\ntransaction (same as rollback)", fillcolor="#fdecea", color="#e34948"];
+  s -> d -> c -> ok;
+  d -> rb [label="0 rows: insufficient funds\nor SQLException"];
+  c -> rb [label="SQLException /\nRuntimeException"];
+  d -> crash [style=dashed]; crash -> srv [style=dashed, label="connection lost"];
+}

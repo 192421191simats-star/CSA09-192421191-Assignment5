@@ -1,0 +1,15 @@
+digraph G {
+  rankdir=BT; nodesep=0.35; ranksep=0.5;
+  node [shape=record, fontname="Helvetica", fontsize=9, style=filled, fillcolor="#f4f6fb", color="#1f3a68"];
+  edge [fontname="Helvetica", fontsize=8, color="#444444"];
+  Dao [label="{«interface»\nDao\<T, K\>|insert(T)\lfindById(K) : Optional\<T\>\lfindAll() : List\<T\>\lupdate(T) : boolean\ldelete(K) : boolean\l}"];
+  Jdbc [label="{«abstract» JdbcDao\<T, K\>|columns : List\<Column\<T\>\>\lmapper : RowMapper\<T\>\l5 SQL strings, built ONCE from the columns\l|# query(sql, params) : List\<T\>\l# execute(sql, params) : int\l  borrow - prepare - bind - execute - map - give back\l}"];
+  Student [label="{StudentDao|MAPPING: reg_no*, name, dept, year, email\l|findByDept(dept)\l}"];
+  Course [label="{CourseDao|course_code*, title, credits\l}"];
+  Marks [label="{MarksDao\<Marks, Marks.Key\>|reg_no*, course_code* (composite key)\l}"];
+  Col [label="{«record» Column\<T\>|name, getter, key\l}"];
+  Src [label="{«interface» ConnectionSource|borrow() / giveBack(c)\l(one per call, single, pool)\l}"];
+  Jdbc -> Dao [arrowhead=empty, style=dashed];
+  Student -> Jdbc [arrowhead=empty]; Course -> Jdbc [arrowhead=empty]; Marks -> Jdbc [arrowhead=empty];
+  Jdbc -> Col [label="uses", arrowhead=vee]; Jdbc -> Src [label="uses", arrowhead=vee];
+}

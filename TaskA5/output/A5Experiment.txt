@@ -1,0 +1,37 @@
+$ cd TaskA5
+$ javac -d out src/*.java
+$ java -cp 'out:../lib/*' A5Experiment
+  start:                                 H-192311001 = Rs 2000.00   C-192311001 = Rs 500.00    total Rs 2500.00 (conserved)
+
+=== (1) Transaction, no failure ===
+  after transfer:                        H-192311001 = Rs 1500.00   C-192311001 = Rs 1000.00    total Rs 2500.00 (conserved)
+
+=== (2) Transaction, exception thrown between the two updates ===
+caught: simulated failure after the debit -> rollback()
+  after the failed transfer:             H-192311001 = Rs 1500.00   C-192311001 = Rs 1000.00    total Rs 2500.00 (conserved)
+
+=== (3) Auto-commit, exception thrown between the two updates ===
+caught: simulated failure after the debit -> nothing to roll back, the debit is already committed
+  after the failed transfer:             H-192311001 = Rs 1000.00   C-192311001 = Rs 1000.00    total Rs 2000.00 <-- MONEY LOST
+
+=== (4) A real crash: a separate JVM halts between the two updates ===
+  start:                                 H-192311001 = Rs 2000.00   C-192311001 = Rs 500.00    total Rs 2500.00 (conserved)
+child: first UPDATE done - halting the JVM now (no finally, no rollback)
+  child exit code 9 (transaction)
+  after the crashed TRANSACTION:         H-192311001 = Rs 2000.00   C-192311001 = Rs 500.00    total Rs 2500.00 (conserved)
+child: first UPDATE done - halting the JVM now (no finally, no rollback)
+  child exit code 9 (autocommit)
+  after the crashed AUTO-COMMIT pair:    H-192311001 = Rs 1500.00   C-192311001 = Rs 500.00    total Rs 2000.00 <-- MONEY LOST
+
+=== (5) Insufficient funds ===
+refused: wallet H-192311001 missing or balance below Rs 5000
+  unchanged:                             H-192311001 = Rs 2000.00   C-192311001 = Rs 500.00    total Rs 2500.00 (conserved)
+
+=== (6) Time per transfer (1,000 transfers back and forth, median of 5) ===
+  one transaction (BEGIN, 2 UPDATEs, COMMIT = 1 commit)      699.0 us per transfer
+  two auto-commit UPDATEs (2 commits)                        982.5 us per transfer
+
+=== (7) 4 threads x 250 random transfers between 10 wallets, 5% of them fail between the updates ===
+  transaction  completed 846, failed mid-way 47, refused (funds)  7, deadlock retries 0 | total before Rs 10000.00, after Rs 10000.00 (conserved)
+  autocommit   completed 837, failed mid-way 47, refused (funds) 16, deadlock retries 0 | total before Rs 10000.00, after Rs 7505.00 <-- Rs 2495.00 LOST
+(exit code 0)

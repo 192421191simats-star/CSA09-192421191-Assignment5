@@ -1,0 +1,30 @@
+$ cd TaskA1
+$ javac -d out *.java
+$ java -cp out A1Benchmark work
+=== (1) The two designed layouts on 5 sample passes ===
+(a) text file sample.csv (442 bytes):
+    #BUSPASS v1 pass_id,reg_no,name,route_no,boarding_stop,valid_until,amount,crc32
+    P100001,192300001,Arun M,15,Main Gate,2027-06-30,3700.00,f3ec14e5
+    P100002,192300002,Surya Natarajan,26,Main Gate,2027-06-30,3400.00,115b7617
+    P100003,192300003,"Rao, ""AK"" Arun",12,Main Gate,2027-06-30,3100.00,5a5f51b4
+    P100004,192300004,Rahul Kumar,4,Ambattur,2027-06-30,3000.00,9bcc7080
+    P100005,192300005,Arun Krishnan,22,Vadapalani,2027-06-30,3500.00,468d599e
+(b) binary file sample.bin (290 bytes) read back: 5 passes, problems []
+    record 3 name read back from binary: Rao, "AK" Arun   equal to original: true
+    first 48 bytes (hex): 42505331 0001002d 00075031 30303030 310b7643 e1000641 72756e20 4d0f0009 4d61696e 20476174 65000052 07000000 
+    after cutting the last 20 bytes off (power failure): 4 passes, problems [record 5: cut short (53-byte body expected) - incomplete write]
+
+=== (2) find by pass ID: text scan O(n) vs RandomAccessFile seek O(1) (median of 15) ===
+records       text scan ms        RAF seek ms       speed-up
+1,000                0.141             0.0036            39x
+10,000               1.500             0.0218            69x
+50,000               7.107             0.0426           167x
+100,000             10.418             0.0349           299x
+
+=== (3) Space for 100,000 passes ===
+text (CSV + CRC)             6,972,227 bytes    69.7 bytes/record
+binary (DataOutputStream)    5,492,528 bytes    54.9 bytes/record
+fixed 128-byte records      12,800,000 bytes   128.0 bytes/record
+  of which useful data       6,385,044 bytes; padding 6,414,956 bytes = 50.1% of the file
+Raw data: data/a1_find.csv, data/a1_space.csv
+(exit code 0)

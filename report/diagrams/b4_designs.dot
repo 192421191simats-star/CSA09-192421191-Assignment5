@@ -1,0 +1,18 @@
+digraph G {
+  rankdir=LR; nodesep=0.25; ranksep=0.6; compound=true;
+  node [shape=box, fontname="Helvetica", fontsize=9, style="rounded,filled", fillcolor="#f4f6fb", color="#1f3a68"];
+  edge [color="#555555", fontname="Helvetica", fontsize=8];
+  subgraph cluster_db { label="Chosen: one shared database"; fontname="Helvetica-Bold"; fontsize=10; color="#1baf7a";
+    c1 [label="Counter (campus 1)"]; c2 [label="Counter (campus 2)"]; c3 [label="... campus 12"];
+    db [label="bus_pass table\nPRIMARY KEY pass_id, index route_no\ntransactions + row locks", shape=cylinder, fillcolor="#e3f4ea", color="#1baf7a"];
+    mig [label="MigratePasses\n(validate, batch 1,000,\none transaction, failure report)"];
+    c1 -> db [label="INSERT (PreparedStatement)"]; c2 -> db; c3 -> db; mig -> db;
+  }
+  subgraph cluster_files { label="Alternative: a serialized file per campus"; fontname="Helvetica-Bold"; fontsize=10; color="#e34948";
+    k1 [label="Counters of campus 1"]; f1 [label="campus1.ser\n(whole list)", shape=note];
+    k2 [label="Counters of campus 2"]; f2 [label="campus2.ser", shape=note];
+    s [label="Search across campuses:\nopen + deserialize 12 files", style="rounded,dashed", fillcolor="#ffffff"];
+    k1 -> f1 [label="load ALL, add 1,\nsave ALL (lock needed)"]; k2 -> f2;
+    f1 -> s [style=dashed]; f2 -> s [style=dashed];
+  }
+}
