@@ -1,0 +1,9 @@
+$ cd TaskA3
+$ javac -d out $(find src -name '*.java')
+$ java -cp 'out:../lib/*' OpTiming
+design (findById, 1,000-row table, median of 7 interleaved rounds)  us per call
+inline SQL in the service (prepare + execute + map)               120.3
+generic Dao<T,K> (same SQL, + lambdas and an Object[])            118.9
+original StudentDB (new connection + Statement per call)         6642.0
+DAO / inline = 0.99 ; one-off space of the DAO: 5 SQL strings + 5 Column objects per entity type (< 2 KB)
+(exit code 0)

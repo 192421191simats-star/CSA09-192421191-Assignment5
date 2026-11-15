@@ -1,0 +1,5 @@
+method,median_ms,peak_heap_mb,file_mb
+Files.readAllLines(),225.98,127.46,50.00
+BufferedReader.readLine(),128.63,26.55,50.00
+Files.lines() stream,140.84,30.04,50.00
+read(byte[64 KB]),87.27,0.00,50.00

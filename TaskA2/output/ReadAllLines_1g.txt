@@ -1,0 +1,16 @@
+$ cd TaskA2
+$ javac -d out ReadAllLinesVsBuffered.java
+$ java -Xmx1g -cp out ReadAllLinesVsBuffered ../TaskB1/work/attendance_50MB.log
+File attendance_50MB.log: 52,428,787 bytes (50.0 MB)
+
+method                          median ms        lines    peak extra heap    heap / file
+Files.readAllLines()                226.0    1,059,123           127.5 MB          2.55x
+BufferedReader.readLine()           128.6    1,059,123            26.5 MB          0.53x
+Files.lines() stream                140.8    1,059,123            30.0 MB          0.60x
+read(byte[64 KB])                    87.3    1,059,123             0.0 MB          0.00x
+
+=== A2.3 when buffering does NOT help: the program already reads in big blocks ===
+FileInputStream.read(byte[64 KB])                           32.3 ms (median of 21)
+BufferedInputStream(FileInputStream).read(byte[64 KB])      32.7 ms (median of 21) - requests >= 8 KB bypass the buffer
+Raw data: data/a2_readall.csv
+(exit code 0)

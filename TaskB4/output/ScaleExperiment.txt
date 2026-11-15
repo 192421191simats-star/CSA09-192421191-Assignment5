@@ -1,0 +1,23 @@
+$ cd TaskB4
+$ javac -d out -cp '../lib/*' src/*.java
+$ java -Xmx3g -cp 'out:../lib/*' ScaleExperiment
+=== (1) Migrate 12 campus files of 66,667 passes each (about 1% damaged) into one table ===
+  inserted 791,923 rows, 8,081 lines reported as failed, total 27.2 s = 29,142 rows/s (batches of 1,000, one transaction per campus file)
+
+=== (2) Searching one shared database (791,923 rows) ===
+  find one pass by pass_id (primary-key index, median of 200)      32.8 us
+  list one route across all campuses (~19,747 rows, median of 9)      47.7 ms
+  table + indexes on disk                                         137.4 MB
+
+=== (3) Alternative: every campus keeps its own serialized file ===
+  12 files, total size                                              97.5 MB
+  find one campus-12 pass: open + deserialize the files until found (median of 3)     2594 ms
+  find a random pass: all 12 lists already in one JVM's memory, scan (median of 21)   29.4 ms
+  list one route: scan all lists in memory (median of 9)            28.9 ms
+
+=== (4) Counters issuing passes at the same time ===
+  database, 12 counters x 50 passes + 2 shared IDs each: issued 602, rejected as duplicates 22, rows stored 602 (expected 602), 272 ms, 0.45 ms per pass
+  serialized file, 4 counters x 10 passes, no lock  : 7 of 40 passes in the file -> 33 LOST; 32 operations failed {EOFException=29, StreamCorruptedException=3}; 5482 ms = 137 ms per pass (whole 66,043-pass file rewritten each time)
+  serialized file, 4 counters x 10 passes, WITH lock: 40 of 40 passes in the file -> 0 LOST; 0 operations failed ; 19963 ms = 499 ms per pass (whole 66,043-pass file rewritten each time)
+Raw data: data/b4_scale.csv
+(exit code 0)

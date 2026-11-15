@@ -1,0 +1,6 @@
+$ cd TaskA2
+$ javac -d out ReadAllLinesVsBuffered.java
+$ java -Xmx64m -cp out ReadAllLinesVsBuffered ../TaskB1/work/attendance_50MB.log readAllLines; java -Xmx16m -cp out ReadAllLinesVsBuffered ../TaskB1/work/attendance_50MB.log bufferedReader
+readAllLines with max heap 64 MB: java.lang.OutOfMemoryError: Java heap space after 627 ms
+bufferedReader with -Xmx16m: 1,059,123 lines in 251 ms
+(exit code 0)

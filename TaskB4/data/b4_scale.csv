@@ -1,0 +1,16 @@
+metric,value,unit
+migration_rows,791923,rows
+migration_s,27.18,s
+db_find_us,32.8,us
+db_route_ms,47.7,ms
+db_bytes,144056320,bytes
+ser_bytes,102266424,bytes
+ser_find_cold_ms,2594.2,ms
+ser_find_warm_ms,29.36,ms
+ser_route_ms,28.92,ms
+db_concurrent_ms_per_pass,0.451,ms
+db_concurrent_lost,0,passes
+file_nolock_ms_per_pass,137.1,ms
+file_nolock_lost,33,passes
+file_locked_ms_per_pass,499.1,ms
+file_locked_lost,0,passes

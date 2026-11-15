@@ -1,0 +1,10 @@
+$ cd TaskA4
+$ for v in uid_v1 uid_v2 nouid_v1 nouid_v2; do javac -d out_$v versions/$v/hostel/*.java VersionDemo.java; done; mkdir -p work
+$ java -cp out_uid_v1 VersionDemo write work/v1_uid.ser; java -cp out_uid_v2 VersionDemo read work/v1_uid.ser; java -cp out_uid_v2 VersionDemo write work/v2_uid.ser; java -cp out_uid_v1 VersionDemo read work/v2_uid.ser; java -cp out_nouid_v1 VersionDemo write work/v1_nouid.ser; java -cp out_nouid_v2 VersionDemo read work/v1_nouid.ser
+WRITE with Resident v1 (no phone), serialVersionUID = 1 -> v1_uid.ser (429 bytes)
+READ  with Resident v2 (with phone), serialVersionUID = 1 -> OK: [Arun Kumar (192311001, phone (not recorded)), Divya R (192311002, phone (not recorded))]
+WRITE with Resident v2 (with phone), serialVersionUID = 1 -> v2_uid.ser (457 bytes)
+READ  with Resident v1 (no phone), serialVersionUID = 1 -> OK: [Arun Kumar (192311001), Divya R (192311002)]
+WRITE with Resident v1 (no phone), serialVersionUID = -7435966155176557058 -> v1_nouid.ser (429 bytes)
+READ  with Resident v2 (with phone), serialVersionUID = -7378081878039426 -> FAILED: InvalidClassException: hostel.Resident; local class incompatible: stream classdesc serialVersionUID = -7435966155176557058, local class serialVersionUID = -7378081878039426
+(exit code 0)

@@ -1,0 +1,22 @@
+$ cd TaskB4
+$ javac -d out -cp '../lib/*' src/*.java
+$ java -cp 'out:../lib/*' MigratePasses input/passes_campus1_2025.csv 1 output/migration_failures_run1.csv fresh
+(bus_pass emptied first)
+Migrated input/passes_campus1_2025.csv (campus 1) in 651 ms
+  lines read 8,001 | valid 7,906 | inserted 7,906 | already in database 0 | duplicate in file 11 | damaged 83
+  check: valid = inserted + already in database ? true
+  failure report output/migration_failures_run1.csv (94 entries; first 12 shown):
+    line,pass_id,reason,text
+    132,P100131,"bad valid_until '2027-13-01'","P100131,192400131,Rahul S,20,Vadapalani,2027-13-01,4600.0..."
+    194,P100193,"expected 8 fields, found 5","P100193,192400193,Keerthana S,4,"
+    242,P100240,"duplicate pass_id in the file (first at line 241)","P100240,192400240,Surya Das,39,Guindy,2027-06-30,5600.00,..."
+    245,P100244,"bad valid_until '2027-13-01'","P100244,192400244,Nandhini Iyer,14,Avadi,2027-13-01,4300...."
+    253,P100252,"checksum mismatch (stored 14a51323, computed 9a9ff97b)","P100252,192400252,Divya Raj,28,Poonamallee,2027-06-30,954..."
+    268,P100267,"bad valid_until '2027-13-01'","P100267,192400267,""Das, Surya"",36,T. Nagar,2027-13-01,460..."
+    333,P100332,"expected 8 fields, found 5","P100332,192400332,Harish Kumar,34,Po"
+    343,P100342,"bad valid_until '2027-13-01'","P100342,192400342,Meena Iyer,3,Koyambedu,2027-13-01,3000...."
+    372,,"empty line",""
+    406,P100404,"duplicate pass_id in the file (first at line 405)","P100404,192400404,Rahul Kumar,35,Main Gate,2027-06-30,580..."
+    684,,"empty line",""
+    746,P100745,"route_no not a number: 'R16'","P100745,192400745,Meena Krishnan,R16,Koyambedu,2027-06-30..."
+(exit code 0)

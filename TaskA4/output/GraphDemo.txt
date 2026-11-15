@@ -1,0 +1,17 @@
+$ cd TaskA4
+$ javac -d out $(find src -name '*.java')
+$ java -cp 'out:../lib/*' GraphDemo
+=== (1) Wrong design: nothing transient ===
+writeObject -> NotSerializableException: minipg.Dispatch   (the live Connection cannot be written)
+with db set to null it serializes (173 bytes) - and the file contains the password in clear: true
+
+=== (2) Correct design: password and db are transient ===
+writeObject(hostel) -> work/hostel.ser, 501 bytes; contains a password? false / false
+readObject -> hostel 'Vivekananda Hostel', 2 rooms, 3 residents
+  every reachable object was saved (Hostel -> List -> Room -> List -> Resident) without listing them
+  resident 1: name=Arun Kumar, regNo=192311001, password=null, db=null   <- transient fields come back as null
+  shared reference kept: back.warden == room101.resident[0] ? true  (written once, the second use is a back-reference)
+  cycle handled: back.rooms[0].hostel == back ? true
+  new objects: back == h ? false ; constructors were NOT run for Serializable classes
+  after loading, the program must re-attach a Connection and ask for passwords again (or keep only a hash)
+(exit code 0)

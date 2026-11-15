@@ -1,0 +1,42 @@
+$ cd TaskA3
+$ javac -d out $(find src -name '*.java')
+$ java -cp 'out:../lib/*' RenameExperiment before; java -Dstudent.email.column=email_id -cp 'out:../lib/*' RenameExperiment after
+=== Places that name the column 'email' (string literals in the source) ===
+inline design: src/inline/*    10 string literals in 2 file(s): [StudentScreen.java (4), StudentService.java (6)]
+DAO design:    src/dao/*        2 string literals in 1 file(s): [StudentDao.java (2)]
+
+ALTER TABLE student RENAME COLUMN email TO email_id   -- done
+
+Inline SQL design (StudentService + StudentScreen):
+  StudentService.register            FAILED  ERROR: column "email" of relation "student" does not exist
+  StudentService.show                FAILED  ERROR: column "email" does not exist
+  StudentService.listDept            FAILED  ERROR: column "email" does not exist
+  StudentService.changeEmail         FAILED  ERROR: column "email" of relation "student" does not exist
+  StudentService.remove              ok      false
+  StudentScreen.profileCard          FAILED  ERROR: column "email" does not exist
+  StudentScreen.whoOwnsEmail         FAILED  ERROR: column "email" does not exist
+  StudentScreen.missingEmailCount    FAILED  ERROR: column "email" does not exist
+  -> 7 of 8 operations broken; each must be found and edited by hand
+
+DAO, mapping unchanged:
+  StudentDao.insert                  FAILED  ERROR: column "email" of relation "student" does not exist
+  StudentDao.findById                FAILED  ERROR: column "email" does not exist
+  StudentDao.findAll                 FAILED  ERROR: column "email" does not exist
+  StudentDao.findByDept              FAILED  ERROR: column "email" does not exist
+  StudentDao.update                  FAILED  ERROR: column "email" of relation "student" does not exist
+  StudentDao.delete                  ok      false
+  -> 5 of 6 operations broken
+
+(the column stays renamed for the next run)
+Run with -Dstudent.email.column=email_id  (StudentDao.EMAIL - the one place that names the column)
+
+DAO after the one-line change:
+  StudentDao.insert                  ok      inserted
+  StudentDao.findById                ok      Student[regNo=192311010, name=Meena S, dept=IT, year=2, email=meena@saveetha.ac.in]
+  StudentDao.findAll                 ok      2 rows
+  StudentDao.findByDept              ok      2 rows
+  StudentDao.update                  ok      true
+  StudentDao.delete                  ok      true
+  -> 0 of 6 operations broken
+ALTER TABLE student RENAME COLUMN email_id TO email   -- restored
+(exit code 0)
