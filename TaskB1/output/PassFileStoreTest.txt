@@ -1,0 +1,35 @@
+$ cd TaskB1
+$ javac -d out *.java
+$ java -cp out PassFileStoreTest
+File after the tests (passes.csv):
+   1 | #BUSPASS v1 pass_id,reg_no,name,route_no,boarding_stop,valid_until,amount,crc32
+   2 | P1001,192311001,Arun Kumar,12,Main Gate,2027-06-30,4500.00,0de47a19
+   3 | P1002,192311002,"Rao, Arun",7,Main Gate,2027-06-30,3800.00,2ce85ac3
+   4 | P1003,192311003,"Divya ""DJ"" R",12,Main Gate,2027-06-30,4200.50,03de3522
+   5 | P1004,DAMAGED LINE
+   6 | 
+   7 | P1005,192311005,Meena S,12,Main Gate,2027-06-30,9000.00,8a0eab5c
+   8 | P1006,192311006,Karthik R,12,Main Gate,2027-06-30,3900.00,14878c42
+   9 | P1007,192311007,Sneha M,3,Main 
+  10 | P1008,192311008,Vignesh K,3,Main Gate,2027-06-30,4300.00,f43c3dac
+
+ID   test                                       verifies                                             actual                                           result
+T1   find P1001 (normal)                        a stored pass is found with all fields               P1001/Arun Kumar/12/4500.00                      PASS
+T2   find P9999 (does not exist)                a missing ID returns 'not found', no exception       not found                                        PASS
+T3   list route 12                              only route-12 passes, in file order                  [P1001, P1003]                                   PASS
+T4   find P1002 - name 'Rao, Arun'              a delimiter inside a field survives (quoting)        P1002/Rao, Arun/7/3800.00                        PASS
+T5   find P1003 - name with quotes              quotes are doubled and restored                      P1003/Divya "DJ" R/12/4200.50                    PASS
+T6   find P1006 after a damaged line            a damaged line does not stop the search              P1006/Karthik R/12/3900.00                       PASS
+T7   find P1005 (amount edited, checksum wrong) tampered/corrupted record is not trusted             not found                                        PASS
+T7b  reason reported for P1005                  the damage is explained, with line number            line 7: checksum mismatch                        PASS
+T8   load all: valid / damaged                  every bad line is reported, valid lines kept         4 valid, 3 damaged                               PASS
+T8b  damage report                              line numbers and reasons                             [5: expected 8 fields, found 2, 6: empty line, 7: checksum mismatch] PASS
+T9   write cut short, then add P1008            next add starts a new line; the new record is intact P1008/Vignesh K/3/4300.00                        PASS
+T9b  find P1007 (the cut-short record)          a partial record is detected, not read as data       not found                                        PASS
+T9c  reason for the cut-short record            detected by field count / checksum                   line 9: expected 8 fields, found 5               PASS
+T10  add route 150                              validation on write; file unchanged                  refused: invalid pass: route_no out of range: 150 / file unchanged PASS
+T11  add a name with a line break               one record = one line is guaranteed                  refused: line breaks are not allowed in a field  PASS
+T12  find in a missing file                     missing file = no passes, reported, no crash         not found / file missing.csv does not exist      PASS
+T13  add to a missing file                      the file is created with its header line             header + 1 record                                PASS
+17 / 17 tests passed
+(exit code 0)

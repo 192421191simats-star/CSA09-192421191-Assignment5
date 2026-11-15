@@ -1,0 +1,5 @@
+rows,mode,ms
+10000,autocommit,2599.6
+10000,transaction,242.4
+100000,autocommit,28662.9
+100000,transaction,2311.3

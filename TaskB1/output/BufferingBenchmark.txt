@@ -1,0 +1,18 @@
+$ cd TaskB1
+$ javac -d out *.java
+$ java -cp out BufferingBenchmark work
+file     method                                median ms        lines             MB/s
+1 MB     FileInputStream.read() per byte           361.7       21,187              2.8
+1 MB     BufferedInputStream (8 KB)                 23.4       21,187             42.7
+1 MB     read(byte[64 KB])                           1.4       21,187            696.7
+1 MB     BufferedReader.readLine()                   2.6       21,187            384.0
+10 MB    FileInputStream.read() per byte          3560.5      211,830              2.8
+10 MB    BufferedInputStream (8 KB)                224.4      211,830             44.6
+10 MB    read(byte[64 KB])                           7.0      211,830           1434.3
+10 MB    BufferedReader.readLine()                  17.3      211,830            576.7
+50 MB    FileInputStream.read() per byte         17780.4    1,059,123              2.8
+50 MB    BufferedInputStream (8 KB)               1176.5    1,059,123             42.5
+50 MB    read(byte[64 KB])                          41.5    1,059,123           1204.1
+50 MB    BufferedReader.readLine()                  71.7    1,059,123            697.2
+Raw data: data/b1_buffering.csv
+(exit code 0)

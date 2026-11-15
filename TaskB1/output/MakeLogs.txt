@@ -1,0 +1,7 @@
+$ cd TaskB1
+$ javac -d out *.java
+$ java -cp out MakeLogs work
+work/attendance_1MB.log  1,048,540 bytes
+work/attendance_10MB.log  10,485,713 bytes
+work/attendance_50MB.log  52,428,787 bytes
+(exit code 0)

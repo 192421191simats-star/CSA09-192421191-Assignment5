@@ -1,0 +1,9 @@
+$ cd TaskB1
+$ javac -d out *.java
+$ bash count_syscalls.sh work/attendance_1MB.log
+mode             file bytes  read() syscalls  bytes per syscall
+unbuffered          1048540          1048541                1.0
+buffered            1048540              128             8191.7
+array               1048540               16            65533.8
+reader              1048540              129             8128.2
+(exit code 0)

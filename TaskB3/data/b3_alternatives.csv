@@ -1,0 +1,7 @@
+approach,rows,ms,rows_per_s,client_bytes_per_batch
+"PreparedStatement batch, b = 100",100000,2629.4,38031,14056
+"PreparedStatement batch, b = 1,000",100000,2600.3,38458,140952
+"PreparedStatement batch, b = 10,000",100000,2284.1,43781,1416232
+"multi-row INSERT, b = 100 rows/statement",100000,1156.2,86492,9600
+"multi-row INSERT, b = 1,000 rows/statement",100000,1015.1,98517,96000
+"COPY FROM STDIN (streamed)",100000,427.9,233695,65592

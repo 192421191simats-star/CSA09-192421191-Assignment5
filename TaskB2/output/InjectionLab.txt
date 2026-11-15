@@ -1,0 +1,96 @@
+$ cd TaskB2
+$ javac -d out src/*.java
+$ java -cp 'out:../lib/*' InjectionLab
+=== A0 genuine login ===
+  id  = arun
+  pwd = arun@123
+  unsafe SQL text: SELECT * FROM users WHERE id='arun' AND pwd='arun@123'
+  unsafe (concat)    -> LOGGED IN as 'Arun Kumar'
+  PreparedStatement  -> LOGGED IN as 'Arun Kumar'
+  escape quotes      -> LOGGED IN as 'Arun Kumar'
+  regex whitelist    -> LOGGED IN as 'Arun Kumar'
+  reveals: baseline: all four accept the right password
+
+=== A1 wrong password ===
+  id  = arun
+  pwd = guess
+  unsafe SQL text: SELECT * FROM users WHERE id='arun' AND pwd='guess'
+  unsafe (concat)    -> REJECTED (invalid login)
+  PreparedStatement  -> REJECTED (invalid login)
+  escape quotes      -> REJECTED (invalid login)
+  regex whitelist    -> REJECTED (invalid login)
+  reveals: baseline: all four reject it
+
+=== A2 comment out the password ===
+  id  = admin' -- 
+  pwd = anything
+  unsafe SQL text: SELECT * FROM users WHERE id='admin' -- ' AND pwd='anything'
+  unsafe (concat)    -> LOGGED IN as 'Transport Admin'
+  PreparedStatement  -> REJECTED (invalid login)
+  escape quotes      -> REJECTED (invalid login)
+  regex whitelist    -> REJECTED before the query (input rejected by the pattern)
+  reveals: input becomes SQL: -- turns the password test into a comment
+
+=== A3 tautology in both fields ===
+  id  = x' OR '1'='1
+  pwd = x' OR '1'='1
+  unsafe SQL text: SELECT * FROM users WHERE id='x' OR '1'='1' AND pwd='x' OR '1'='1'
+  unsafe (concat)    -> LOGGED IN as 'Transport Admin'
+  PreparedStatement  -> REJECTED (invalid login)
+  escape quotes      -> REJECTED (invalid login)
+  regex whitelist    -> REJECTED before the query (input rejected by the pattern)
+  reveals: a condition that is always true logs in as the FIRST user
+
+=== A4 tautology in the password ===
+  id  = arun
+  pwd = ' OR ''='
+  unsafe SQL text: SELECT * FROM users WHERE id='arun' AND pwd='' OR ''=''
+  unsafe (concat)    -> LOGGED IN as 'Transport Admin'
+  PreparedStatement  -> REJECTED (invalid login)
+  escape quotes      -> REJECTED (invalid login)
+  regex whitelist    -> REJECTED before the query (input rejected by the pattern)
+  reveals: knowing only a user name is enough
+
+=== A5 UNION - read another row ===
+  id  = nobody' UNION SELECT id, full_name, pwd, role FROM users WHERE role='ADMIN' -- 
+  pwd = x
+  unsafe SQL text: SELECT * FROM users WHERE id='nobody' UNION SELECT id, full_name, pwd, role FROM users WHERE role='ADMIN' -- ' AND pwd='x'
+  unsafe (concat)    -> LOGGED IN as 'Adm!n#2026'
+  PreparedStatement  -> REJECTED (invalid login)
+  escape quotes      -> REJECTED (invalid login)
+  regex whitelist    -> REJECTED before the query (input rejected by the pattern)
+  reveals: the 'name' shown is the admin's PASSWORD: data theft
+
+=== A6 stacked statement ===
+  id  = x'; UPDATE users SET full_name='HACKED' WHERE id='admin'; --
+  pwd = x
+  unsafe SQL text: SELECT * FROM users WHERE id='x'; UPDATE users SET full_name='HACKED' WHERE id='admin'; --' AND pwd='x'
+  unsafe (concat)    -> ERROR 02000: Statement did not return a result set: SELECT * FROM users WHERE id='x...   !! users.admin.full_name is now 'HACKED'
+  PreparedStatement  -> REJECTED (invalid login)
+  escape quotes      -> REJECTED (invalid login)
+  regex whitelist    -> REJECTED before the query (input rejected by the pattern)
+  reveals: a second statement runs: data is CHANGED
+
+=== A7 escaping is not enough: backslash escapes (MySQL default; PostgreSQL with standard_conforming_strings=off) ===
+  id  = \' OR 1=1 --       escaped -> \'' OR 1=1 -- 
+  SQL text: SELECT * FROM users WHERE id='\'' OR 1=1 -- ' AND pwd='x'
+  unsafe (concat)    -> REJECTED
+  PreparedStatement  -> REJECTED
+  escape quotes      -> LOGGED IN as 'Transport Admin'
+  regex whitelist    -> REJECTED before the query (input rejected by the pattern)
+  reveals: \' is read as an escaped quote, so the added ' closes the string - escaping depends on server settings
+
+=== A8 the regex is either too strict or too weak: genuine users with unusual passwords ===
+  unsafe (concat)    -> ERROR 42601: ERROR: syntax error at or near "Souza"
+  PreparedStatement  -> LOGGED IN as 'Priya D'Souza'
+  escape quotes      -> LOGGED IN as 'Priya D'Souza'
+  regex whitelist    -> REJECTED before the query (input rejected by the pattern)  <- a genuine user is locked out
+
+=== Time per login check (2,000 genuine logins per round, 9 interleaved rounds, median) ===
+  unsafe concatenation (Statement)             64.8 us per login
+  escape quotes + Statement                    74.3 us per login
+  regex whitelist + Statement                  78.3 us per login
+  PreparedStatement, prepared per call         82.3 us per login
+  PreparedStatement, prepared once             23.4 us per login
+  validation alone: regex check 198 ns, quote escaping 15 ns per login (1,000,000 runs; 1000000/12000000)
+(exit code 0)

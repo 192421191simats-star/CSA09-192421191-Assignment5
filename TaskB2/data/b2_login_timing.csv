@@ -1,0 +1,8 @@
+method,us_per_login
+"unsafe concatenation (Statement)",64.80
+"escape quotes + Statement",74.32
+"regex whitelist + Statement",78.26
+"PreparedStatement, prepared per call",82.25
+"PreparedStatement, prepared once",23.45
+"regex check alone",0.1982
+"quote escaping alone",0.0146

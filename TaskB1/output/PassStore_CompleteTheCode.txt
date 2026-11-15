@@ -1,0 +1,6 @@
+$ cd TaskB1
+$ javac -d out PassStore.java
+$ java -cp out PassStore
+[P1003, 192311003, Divya, 7, 3800.0]
+null
+(exit code 0)

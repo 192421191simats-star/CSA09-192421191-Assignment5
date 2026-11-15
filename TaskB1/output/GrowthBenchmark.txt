@@ -1,0 +1,27 @@
+$ cd TaskB1
+$ javac -d out *.java
+$ java -Xmx1g -cp out GrowthBenchmark work
+=== B1.4 find(passId) by linear scan (median of 15 runs) ===
+records      file KB    first ms   middle ms     last ms    missing ms  us per record
+1,000             68       0.081       0.421       0.760         0.685          0.685
+5,000            341       0.201       1.232       1.142         1.027          0.205
+10,000           681       0.037       0.640       1.271         1.237          0.124
+50,000          3404       0.026       2.674       5.308         5.052          0.101
+100,000         6809       0.034       8.516       9.863         9.938          0.099
+
+=== Alternative: read once into HashMap<String, String[]>, then q searches ===
+records        q  scan q times ms    map build ms   map q lookups ms   map total ms      map heap MB
+1,000          1              0.2            10.1              0.016           10.1              0.0
+1,000         10              1.2            12.5              0.043           12.6              0.5
+1,000        100             17.3            10.7              0.084           10.7              0.5
+1,000       1000             93.3             8.9              0.197            9.1              0.5
+10,000         1              1.4            91.4              0.039           91.4              5.2
+10,000        10             10.2            95.8              0.035           95.9              5.2
+10,000       100             90.0            62.8              0.042           62.8              5.2
+10,000      1000            706.3            57.6              0.564           58.2              5.2
+100,000        1              5.8           527.5              0.009          527.5             53.4
+100,000       10             59.4           509.2              0.013          509.2             53.3
+100,000      100            895.6           574.1              0.052          574.1             53.3
+100,000     1000           6378.5           424.5              0.378          424.9             53.4   (scan: 100 timed, scaled)
+Raw data: data/b1_growth.csv, data/b1_hashmap.csv
+(exit code 0)

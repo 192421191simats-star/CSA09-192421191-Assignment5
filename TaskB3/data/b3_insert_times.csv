@@ -1,0 +1,16 @@
+rows,approach,ms,rows_per_s
+1000,"(a) Statement",379.87,2633
+10000,"(a) Statement",3564.47,2805
+100000,"(a) Statement",34264.28,2918
+1000,"(b) PreparedStatement",383.57,2607
+10000,"(b) PreparedStatement",3193.82,3131
+100000,"(b) PreparedStatement",35072.56,2851
+1000,"(c) batch, 1,000 per executeBatch",255.98,3907
+10000,"(c) batch, 1,000 per executeBatch",2711.19,3688
+100000,"(c) batch, 1,000 per executeBatch",28799.75,3472
+1000,"(a) Statement - inside 1 transaction",76.96,12994
+10000,"(a) Statement - inside 1 transaction",803.13,12451
+100000,"(a) Statement - inside 1 transaction",8952.80,11170
+1000,"(b) PreparedStatement - inside 1 transaction",56.04,17845
+10000,"(b) PreparedStatement - inside 1 transaction",711.83,14048
+100000,"(b) PreparedStatement - inside 1 transaction",7147.67,13991
